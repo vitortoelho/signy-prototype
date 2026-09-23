@@ -2,6 +2,8 @@
 
 Aplicação web interna baseada no documento `projeto_Signy_relatorio_atual.pdf` (40 páginas). O banco inicial fica vazio, pronto para os cadastros da academia. Os dados usados nos testes são fictícios e isolados em memória.
 
+**Aplicação em produção (nuvem):** [https://signy-mvp.onrender.com/](https://signy-mvp.onrender.com/)
+
 ## Executar
 
 **Hospedagem gratuita:** o projeto agora aceita PostgreSQL externo por `DATABASE_URL`. A configuração `render.yaml` seleciona explicitamente Render Free, usando Neon Free para persistência. Veja [DEPLOY.md](DEPLOY.md). Sem `DATABASE_URL`, a execução local continua usando PGlite. Os cadastros locais não são transferidos automaticamente ao banco remoto.
