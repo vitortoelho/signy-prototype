@@ -1,6 +1,12 @@
 # Signy — MVP de gestão de academia
 
-Aplicação web interna baseada no documento `projeto_Signy_relatorio_atual.pdf` (40 páginas). O banco inicial fica vazio, pronto para os cadastros da academia. Os dados usados nos testes são fictícios e isolados em memória.
+O **Signy** é uma aplicação web voltada ao gerenciamento operacional completo de academias de musculação e centros de condicionamento físico de pequeno a médio porte. O sistema centraliza rotinas críticas do dia a dia em uma plataforma integrada, eliminando controles manuais e planilhas descentralizadas por meio da gestão de alunos, instrutores, planos de adesão, controle de vigência de contratos e matrículas, montagem de fichas de treino personalizadas e registro de frequência diária. A persistência baseia-se em um modelo relacional normalizado (3FN) no PostgreSQL, com integridade referencial estrita, validações por constraints e rastreabilidade temporal por triggers de auditoria.
+
+**Evoluções e funcionalidades futuras planejadas:**
+- **Módulo Financeiro e Gateway de Pagamentos:** Gestão de mensalidades, conciliação e cobranças automatizadas com suporte a PIX e cartão de crédito, recibos digitais e relatórios de inadimplência.
+- **Automação de Acesso por Hardware (IoT):** Integração física com catracas eletrônicas e validação em tempo real por QR Code dinâmico, biometria facial ou RFID.
+- **Aplicativo Mobile do Aluno (PWA):** Portal responsivo para consulta de treinos, histórico de cargas, orientações de execução dos exercícios e frequência acumulada.
+- **Business Intelligence (BI) e Painéis Gerenciais:** Dashboards analíticos com métricas operacionais, taxa de retenção de alunos, horários de pico e tempo médio de permanência.
 
 **Aplicação em produção (nuvem):** [https://signy-mvp.onrender.com/](https://signy-mvp.onrender.com/)
 
