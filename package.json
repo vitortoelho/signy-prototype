@@ -5,10 +5,17 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env server.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:browser": "node tests/browser.mjs && node tests/actions.browser.mjs && node tests/setup.browser.mjs",
+    "test:browser": "node tests/entry.browser.mjs && node tests/browser.mjs && node tests/actions.browser.mjs && node tests/setup.browser.mjs && node tests/register.browser.mjs && node tests/open-access.browser.mjs && node tests/platform.browser.mjs && node tests/improvements.browser.mjs",
     "test:real": "node tests/real-flow.browser.mjs",
     "demo:local": "node scripts/criar-demonstracao-local.mjs",
-    "conectar-neon": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/configurar-neon.ps1"
+    "demo:neon": "node --env-file-if-exists=.env scripts/simular-academia.mjs",
+    "verificar:neon": "node --env-file-if-exists=.env scripts/verificar-neon.mjs",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrar-banco-remoto.mjs",
+    "marca:gerar": "node scripts/gerar-marca.mjs",
+    "conectar-neon": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/configurar-neon.ps1",
+    "lint": "node scripts/validar.mjs",
+    "build": "node scripts/build.mjs",
+    "performance": "node scripts/medir-performance.mjs"
   },
   "keywords": [],
   "author": "",

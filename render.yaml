@@ -5,6 +5,7 @@ services:
     name: signy-mvp
     runtime: node
     plan: free
+    autoDeployTrigger: 'off'
     buildCommand: npm ci --omit=dev
     startCommand: npm start
     healthCheckPath: /healthz
@@ -17,5 +18,7 @@ services:
         value: 0.0.0.0
       - key: TRUST_PROXY_HOPS
         value: "1"
+      - key: OPEN_ACCESS
+        value: "false"
       - key: DATABASE_URL
         sync: false
