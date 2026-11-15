@@ -1,16 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Signy, gestão de academia">
-  <rect width="1200" height="630" fill="#163f34"/>
-  <circle cx="1050" cy="110" r="290" fill="none" stroke="#315f51" stroke-width="2"/>
-  <circle cx="1050" cy="110" r="210" fill="none" stroke="#315f51" stroke-width="2"/>
-  <circle cx="108" cy="108" r="44" fill="#f2f6ed"/>
-  <path d="M84 96c0-9 8-15 22-15 11 0 19 3 25 8l-9 12c-5-3-10-5-16-5-5 0-8 2-8 4 0 3 4 4 12 6 16 3 23 9 23 20 0 12-10 20-27 20-13 0-23-4-30-11l10-12c6 5 13 8 21 8 7 0 11-2 11-5 0-4-4-5-13-7-14-3-21-9-21-23Z" fill="#194d40"/>
-  <text x="174" y="130" fill="#f2f6ed" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="66" font-weight="750" letter-spacing="-3">signy</text>
-  <text x="178" y="164" fill="#a9c58e" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" letter-spacing="5">GESTÃO DE ACADEMIA</text>
-  <text x="78" y="340" fill="#f2f6ed" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="58" font-weight="620" letter-spacing="-2">Mais movimento.</text>
-  <text x="78" y="410" fill="#f2f6ed" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="58" font-weight="620" letter-spacing="-2">Menos burocracia.</text>
-  <text x="82" y="480" fill="#b9cabd" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24">Alunos, treinos e rotina em um só lugar.</text>
-  <g transform="translate(865 300) rotate(-12)" fill="none" stroke="#a9c58e" stroke-width="15" stroke-linecap="round">
-    <path d="M35 70v100M5 90v60M225 70v100M255 90v60M35 120h190"/>
-  </g>
-  <rect x="78" y="548" width="1044" height="2" fill="#315f51"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="#232920"/><g transform="translate(70 38) scale(.7)"><g fill="#d0f476" transform="translate(8 3)"><path d="M23 7H88L75 21H40L28 31L68 43L42 65H0L13 51H37L47 43L8 31Z"/><path d="M99 7H114L111 19H96ZM94 24H109L99 65H84Z"/><path d="M132 7H189L176 21H141L122 51H152L158 41H140L146 29H178L162 65H103L119 29Z"/><path d="M197 7H211L227 43L236 7H251L236 65H220L204 30L196 65H180Z"/><path d="M258 7H275L288 26L315 7H334L294 40L286 65H270L277 40Z"/></g><text x="8" y="88" fill="#f4f5ea" font-family="Segoe UI,Arial,sans-serif" font-size="12" font-weight="600" letter-spacing="5.2">GEST?O DE ACADEMIAS</text></g><g font-family="Segoe UI,Arial,sans-serif"><text x="70" y="312" font-size="103" font-weight="700" letter-spacing="-5" fill="#f4f5ea">O treino move.</text><text x="70" y="425" font-size="103" font-weight="700" letter-spacing="-5" fill="#d7ee8c">Você conduz.</text><path d="M76 498H1124" stroke="#57614a"/><text x="76" y="554" font-size="21" fill="#c4cbbb">Alunos · Matrículas · Treinos · Presenças</text></g></svg>
