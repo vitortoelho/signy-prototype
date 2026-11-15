@@ -1,5 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Signy">
-  <rect width="64" height="64" rx="17" fill="#194d40"/>
-  <path d="M18 21c0-6 5-10 14-10 7 0 12 2 16 5l-6 8c-3-2-6-3-10-3-3 0-5 1-5 3 0 2 2 3 8 4 10 2 15 6 15 13 0 8-7 13-17 13-8 0-15-3-19-7l6-8c4 3 8 5 13 5 4 0 7-1 7-3s-2-3-8-4c-9-2-14-6-14-16Z" fill="#f2f6ed"/>
-  <circle cx="48" cy="15" r="4" fill="#a9c58e"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 100 100"><rect width="100" height="100" rx="16" fill="#232920"/><path d="M23 7H88L75 21H40L28 31L68 43L42 65H0L13 51H37L47 43L8 31Z" fill="#d0f476" transform="translate(10 17) scale(.9)"/></svg>
