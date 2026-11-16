@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+import { chromium } from 'playwright';
+import { mkdir } from 'node:fs/promises';
+process.env.NODE_ENV='test';
+process.env.OPEN_ACCESS='false';
+process.env.DATA_DIR='memory://';
+delete process.env.DATABASE_URL;
+process.env.ADMIN_PASSWORD='AdminCadastro123!';
+const {app,db}=await import('../server.mjs');
+const server=app.listen(0,'127.0.0.1');
+await new Promise(resolve=>server.once('listening',resolve));
+const browser=await chromium.launch({headless:true,channel:process.env.PLAYWRIGHT_CHANNEL||'msedge'});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});
+page.setDefaultTimeout(15000);
+const errors=[];page.on('pageerror',error=>errors.push(error.message));
+try{
+ await mkdir('test-results',{recursive:true});
+ await page.goto(`http://127.0.0.1:${server.address().port}`);
+ await page.locator('#login-form').waitFor();
+ await page.screenshot({path:'test-results/public-login.png'});
+ assert.equal(await page.getByRole('button',{name:'Criar conta',exact:true}).count(),0);
+ assert.equal(await page.locator('#register-form').count(),0);
+ await page.locator('[name=login]').fill('admin');
+ await page.locator('[name=senha]').fill('SenhaIncorreta123!');
+ await page.getByRole('button',{name:'Entrar na academia'}).click();
+ await page.getByRole('alert').getByText('Usuário ou senha incorretos.').waitFor();
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'test-results/public-login-mobile.png',fullPage:true});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.locator('[name=login]').fill('admin');
+ await page.locator('[name=senha]').fill('AdminCadastro123!');
+ await page.getByRole('button',{name:'Entrar na academia'}).click();
+ await page.getByRole('heading',{name:'A academia, hoje.'}).waitFor();
+ await page.reload();
+ await page.getByRole('heading',{name:'A academia, hoje.'}).waitFor();
+ await page.locator('.menu-toggle').click();
+ await page.getByRole('button',{name:'Sair',exact:true}).click();
+ await page.locator('#login-form').waitFor();
+ assert.equal(await page.getByRole('button',{name:'Criar conta',exact:true}).count(),0);
+ assert.deepEqual(errors,[]);
+ console.log('Login sem cadastro público, sessão, saída e layout móvel OK.');
+}finally{
+ await browser.close();await new Promise(resolve=>server.close(resolve));await db.close();
+}
