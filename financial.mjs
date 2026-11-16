@@ -43,7 +43,7 @@ export function financialModule(db){
     const order=await mp('/merchant_orders/'+payment.order.id);
     if(order.preference_id!==preferenceId||order.external_reference!==reference||!order.payments?.some(p=>String(p.id)===String(payment.id)))throw Error('A ordem do gateway não corresponde à cobrança da matrícula.');
    }
-   if(!['credit_card','bank_transfer'].includes(payment.payment_type_id)||payment.payment_type_id==='bank_transfer'&&payment.payment_method_id!=='pix')throw Error('Meio de pagamento fora do escopo PIX/cartão de crédito.');
+   if(!['credit_card','bank_transfer','account_money'].includes(payment.payment_type_id)||payment.payment_type_id==='bank_transfer'&&payment.payment_method_id!=='pix')throw Error('Meio de pagamento fora do escopo PIX/cartão de crédito.');
    const states={approved:'confirmado',refunded:'estornado',charged_back:'estornado',rejected:'rejeitado',cancelled:'cancelado',pending:'pendente',in_process:'pendente',authorized:'pendente'};
    const state=states[payment.status];if(!state)throw Error('Situação do gateway desconhecida. Conciliação necessária.');
    const ref=`mp-${payment.id}`;const existing=(await tx.query('SELECT * FROM pagamento WHERE referencia=$1',[ref])).rows[0];
@@ -73,7 +73,7 @@ export function financialModule(db){
    let c=(await tx.query('SELECT * FROM checkout WHERE id_mensalidade=$1',[m.id_mensalidade])).rows[0];
    if(c&&new Date(c.expira)<=new Date())throw Error('Cobrança expirada. A recepção precisa conciliar no provedor.');
    if(c?.url)return {url:c.url};
-   const preference=await mp('/checkout/preferences','POST',{items:[{id:String(m.id_mensalidade),title:`Signy · Mensalidade ${isoDay(m.competencia).slice(0,7)}`,quantity:1,currency_id:'BRL',unit_price:Number(m.valor)}],...(m.email?{payer:{email:m.email}}:{}),external_reference:`signy-${m.id_mensalidade}`,metadata:{signy_checkout_key:c.chave,signy_student_id:m.id_aluno},notification_url:new URL('/api/payments/webhook',appOrigin()).href,back_urls:{success:appOrigin(),pending:appOrigin(),failure:appOrigin()},expires:true,expiration_date_to:new Date(c.expira).toISOString(),payment_methods:{excluded_payment_types:[{id:'ticket'},{id:'atm'},{id:'debit_card'},{id:'prepaid_card'},{id:'account_money'}]}},c.chave);
+   const preference=await mp('/checkout/preferences','POST',{items:[{id:String(m.id_mensalidade),title:`Signy · Mensalidade ${isoDay(m.competencia).slice(0,7)}`,quantity:1,currency_id:'BRL',unit_price:Number(m.valor)}],...(m.email?{payer:{email:m.email}}:{}),external_reference:`signy-${m.id_mensalidade}`,metadata:{signy_checkout_key:c.chave,signy_student_id:m.id_aluno},notification_url:new URL('/api/payments/webhook',appOrigin()).href,back_urls:{success:appOrigin(),pending:appOrigin(),failure:appOrigin()},expires:true,expiration_date_to:new Date(c.expira).toISOString(),payment_methods:{excluded_payment_types:[{id:'ticket'},{id:'atm'},{id:'debit_card'},{id:'prepaid_card'}]}},c.chave);
    const url=process.env.MP_SANDBOX==='true'?preference.sandbox_init_point:preference.init_point;
    if(!url||!/^https:\/\/([a-z0-9-]+\.)?mercadopago\.(com|com\.br)\//.test(url))throw Error('Endereço de pagamento inválido.');
    await tx.query('UPDATE checkout SET url=$2,preference_id=$3 WHERE id_mensalidade=$1',[m.id_mensalidade,url,preference.id||null]);return {url};
@@ -110,7 +110,7 @@ export function financialModule(db){
    const [result]=await q(`WITH bills AS (SELECT m.*,COALESCE((SELECT situacao FROM pagamento pg WHERE pg.id_mensalidade=m.id_mensalidade AND pg.provedor='mercadopago' ORDER BY pg.id_pagamento DESC LIMIT 1),CASE WHEN EXISTS(SELECT 1 FROM checkout c WHERE c.id_mensalidade=m.id_mensalidade AND c.url IS NOT NULL AND c.expira>NOW()) THEN 'pendente' END) AS estado_gateway,a.nome,a.id_aluno,TO_CHAR(CURRENT_DATE,'YYYY-MM-DD') AS hoje,CASE WHEN m.situacao='pendente' AND m.vencimento<CURRENT_DATE THEN 'atraso' ELSE m.situacao END AS status FROM mensalidade m JOIN matricula mt USING(id_matricula) JOIN aluno a USING(id_aluno)), filtered AS (SELECT * FROM bills WHERE nome ILIKE $1 AND ($2='' OR status=$2)) SELECT
     (SELECT count(*)::int FROM filtered) AS total,
     (SELECT count(*)::int FROM bills) AS total_base,
-    COALESCE((SELECT json_agg(r) FROM (SELECT * FROM filtered ORDER BY vencimento DESC,id_mensalidade DESC LIMIT 30 OFFSET $3) r),'[]') AS rows,
+    COALESCE((SELECT json_agg(r) FROM (SELECT * FROM filtered ORDER BY vencimento ASC,id_mensalidade ASC LIMIT 30 OFFSET $3) r),'[]') AS rows,
     (SELECT COALESCE(SUM(valor),0) FROM bills WHERE situacao='pago' AND date_trunc('month',pago_em)=date_trunc('month',CURRENT_DATE)) AS recebido_mes,
     (SELECT COALESCE(SUM(valor),0) FROM bills WHERE status='atraso') AS em_atraso,
     (SELECT COALESCE(SUM(valor),0) FROM bills WHERE situacao='pendente') AS pendente,
