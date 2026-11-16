@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
+import {mkdir} from 'node:fs/promises';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 process.env.NODE_ENV = 'test';
+process.env.OPEN_ACCESS = 'false';
 process.env.DATA_DIR = 'memory://';
 process.env.ADMIN_PASSWORD = 'BotoesTeste123!';
 delete process.env.DATABASE_URL;
@@ -11,7 +13,7 @@ delete process.env.DATABASE_URL;
 const { app, db } = await import('../server.mjs');
 const server = app.listen(0, '127.0.0.1');
 await new Promise(resolve => server.once('listening', resolve));
-const browser = await chromium.launch({ headless: true, channel: 'msedge' });
+const browser = await chromium.launch({ headless: true, channel: process.env.PLAYWRIGHT_CHANNEL || 'msedge' });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 const pageErrors = [];
 page.on('pageerror', error => pageErrors.push(error.message));
@@ -28,6 +30,7 @@ const startForm = async (table, values = {}) => {
   await nav(table);
   await page.locator(`[data-new="${table}"]`).click();
   await page.locator('#edit-form').waitFor();
+  if(await page.locator('.form-disclosure').count())await page.locator('.form-disclosure summary').click();
   for (const [key, value] of Object.entries(values)) {
     const input = page.locator(`#edit-form [name="${key}"]`);
     if (await input.evaluate(element => element.tagName === 'SELECT')) await input.selectOption(String(value));
@@ -53,7 +56,7 @@ try {
   await page.getByText('Usuário ou senha incorretos.').waitFor();
   await page.locator('[name=senha]').fill('BotoesTeste123!');
   await page.getByRole('button', { name: 'Entrar na academia' }).click();
-  await page.getByRole('heading', { name: 'Tudo pronto para um novo dia.' }).waitFor();
+  await page.getByRole('heading', { name: 'A academia, hoje.' }).waitFor();
 
   await page.locator('[data-new=presenca]').click();
   await page.getByRole('heading', { name: 'Nenhum aluno disponível' }).waitFor();
@@ -91,9 +94,11 @@ try {
   await save(await startForm('exercicio', { nome: 'Exercício Temporário', grupo_muscular: 'Braços' }));
 
   await nav('plano');
+  await page.locator('.row-more summary').click();
   await page.locator('[data-toggle]').click();
   await confirm();
   assert.match(await page.locator('tbody').innerText(), /Inativo/);
+  await page.locator('.row-more summary').click();
   await page.locator('[data-toggle]').click();
   await confirm();
   assert.match(await page.locator('tbody').innerText(), /Ativo/);
@@ -160,12 +165,14 @@ try {
 
   for (const [section, item] of [['aluno', 'Aluno Temporário'], ['professor', 'Professor Temporário'], ['exercicio', 'Exercício Temporário']]) {
     await nav(section);
+    await row(item).locator('.row-more summary').click();
     await row(item).locator(`[data-delete="${section}"]`).click();
     await confirm();
     assert.equal(await row(item).count(), 0);
   }
 
   await nav('aluno');
+  await row('Ana Principal').locator('.row-more summary').click();
   await row('Ana Principal').locator('[data-delete=aluno]').click();
   await page.locator('#confirm').click();
   await page.getByText(/existem registros vinculados/).waitFor();
@@ -182,6 +189,9 @@ try {
 
   await page.locator('[data-action=password]').click();
   await page.locator('[name=atual]').fill('BotoesTeste123!');
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  assert.equal(await page.locator('[name=atual]').inputValue(),'BotoesTeste123!');
+  assert.equal(await page.locator('[name=atual]').evaluate(el=>el===document.activeElement),true);
   await page.locator('[name=nova]').fill('SenhaRefinada123!');
   await page.locator('[name=confirmacao]').fill('diferente123');
   await page.getByRole('button', { name: 'Salvar conta' }).click();
@@ -198,13 +208,18 @@ try {
   await page.locator('[name=senha]').fill('SenhaRefinada123!');
   await page.getByRole('button', { name: 'Entrar na academia' }).click();
   try {
-    await page.getByRole('heading', { name: 'Tudo pronto para um novo dia.' }).waitFor({ timeout: 10000 });
+    await page.getByRole('heading', { name: 'A academia, hoje.' }).waitFor({ timeout: 10000 });
   } catch {
     throw new Error(`Novo login falhou após a troca de senha: ${await page.locator('body').innerText()}`);
   }
 
   assert.deepEqual(pageErrors, []);
   console.log('Ações: navegação, pré-requisitos, CRUD, detalhes, filtros, presença, senha e logout OK.');
+} catch(error) {
+  await mkdir('test-results',{recursive:true});
+  await page.screenshot({path:'test-results/actions-failure.png',fullPage:true});
+  console.log(JSON.stringify({pageErrors,modal:await page.locator('#modal').innerText(),invalid:await page.locator('#password-form :invalid').evaluateAll(elements=>elements.map(e=>({name:e.name,message:e.validationMessage})))}));
+  throw error;
 } finally {
   await browser.close();
   await new Promise(resolve => server.close(resolve));
